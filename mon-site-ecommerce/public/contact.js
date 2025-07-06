@@ -35,6 +35,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     setInterval(createParticle, 300);
+    fetch('/api/contact', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    name,
+    email, // Champ spécifique au contact
+    subject,
+    message
+  })
+})
     
     // Effet de survol sur les info-items
     const infoItems = document.querySelectorAll('.info-item');
