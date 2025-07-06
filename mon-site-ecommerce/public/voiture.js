@@ -69,6 +69,19 @@
                 </button>
             </div>
         `;
+        fetch('/api/order', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    productName,
+    customerName, // Champ spécifique à voiture.js
+    customerNumber,
+    comment,
+    serviceType: 'auto' // Identifiant pour les véhicules
+  })
+})
 
         document.body.appendChild(alertDiv);
         
