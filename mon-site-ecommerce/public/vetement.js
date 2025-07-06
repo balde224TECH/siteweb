@@ -25,20 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        fetch('/api/order', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    productName,
-    productID,
-    customerNumber,
-    whatsappNumber,
-    comment,
-    serviceType: 'fashion' // Ajoutez un identifiant de service
-  })
-})
         // Récupérer les valeurs du formulaire
         const productName = document.getElementById('productName').value;
         const whatsappNumber = document.getElementById('whatsappNumber').value;
@@ -64,72 +50,87 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Configuration du bot Telegram
-        const botToken = '7738217538:AAGoNIvjMilJ5Ikt9oalHhpEiRDtS7t3NbU';
-        const chatId = '6804915795';
-
-        // Créer le message à envoyer avec le numéro WhatsApp
-        const message = `🛍 *NOUVELLE COMMANDE SANOUSSY FASHION* 🛍\n\n` +
-                     `📌 *Produit:* ${productName}\n` +
-                     `🆔 *ID:* ${productID}\n` +
-                     `📱 *Téléphone:* ${customerNumber}\n` +
-                     `💬 *WhatsApp:* ${whatsappNumber}\n` +
-                     `✏️ *Message:* ${comment || 'Aucun message supplémentaire'}\n\n` +
-                     `⏱ *Date:* ${new Date().toLocaleString()}`;
-        
-        // Encoder le message pour l'URL
-        const encodedMessage = encodeURIComponent(message);
-        
         // Afficher un indicateur de chargement
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalBtnText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
         submitBtn.disabled = true;
-        
-        // Envoyer le message via l'API Telegram
-        fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodedMessage}&parse_mode=Markdown`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.ok) {
-                    showAlert('✅ Commande envoyée avec succès! Nous vous contacterons bientôt.', 'success');
-                    form.reset();
-                    
-                    // Animation de confirmation
-                    const confirmation = document.createElement('div');
-                    confirmation.innerHTML = `
-                        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-                            background: rgba(0,0,0,0.8); z-index: 9999; display: flex; 
-                            justify-content: center; align-items: center; flex-direction: column;">
-                            <div style="background: white; padding: 2em; border-radius: 16px; text-align: center;
-                                max-width: 500px; animation: zoomIn 0.5s;">
-                                <div style="font-size: 5em; color: #2ed573; margin-bottom: 0.5em;">
-                                    <i class="fas fa-check-circle"></i>
-                                </div>
-                                <h3 style="color: var(--dark-color); margin-bottom: 1em;">Commande confirmée!</h3>
-                                <p style="margin-bottom: 1.5em;">Nous avons bien reçu votre commande et vous contacterons dans les plus brefs délais.</p>
-                                <button onclick="this.parentElement.parentElement.remove()" 
-                                    style="background: var(--gradient); color: white; border: none; 
-                                    padding: 0.75em 1.5em; border-radius: 30px; font-weight: 600;
-                                    cursor: pointer; transition: all 0.3s;">
-                                    Fermer
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    document.body.appendChild(confirmation);
-                } else {
-                    showAlert('❌ Une erreur est survenue. Veuillez réessayer plus tard.', 'danger');
-                    console.error('Erreur Telegram:', data);
-                }
-            })
-            .catch(error => {
-                showAlert('❌ Erreur réseau. Veuillez vérifier votre connexion.', 'danger');
-                console.error('Erreur:', error);
-            })
-            .finally(() => {
-                submitBtn.innerHTML = originalBtnText;
-                submitBtn.disabled = false;
+
+        try {
+            // Envoi à votre API
+            await fetch('/api/order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productName,
+                    productID,
+                    customerNumber,
+                    whatsappNumber,
+                    comment,
+                    serviceType: 'fashion'
+                })
             });
+
+            // Configuration du bot Telegram
+            const botToken = '7738217538:AAGoNIvjMilJ5Ikt9oalHhpEiRDtS7t3NbU';
+            const chatId = '6804915795';
+
+            // Créer le message à envoyer avec le numéro WhatsApp
+            const message = `🛍 *NOUVELLE COMMANDE SANOUSSY FASHION* 🛍\n\n` +
+                         `📌 *Produit:* ${productName}\n` +
+                         `🆔 *ID:* ${productID}\n` +
+                         `📱 *Téléphone:* ${customerNumber}\n` +
+                         `💬 *WhatsApp:* ${whatsappNumber}\n` +
+                         `✏️ *Message:* ${comment || 'Aucun message supplémentaire'}\n\n` +
+                         `⏱ *Date:* ${new Date().toLocaleString()}`;
+            
+            // Encoder le message pour l'URL
+            const encodedMessage = encodeURIComponent(message);
+            
+            // Envoyer le message via l'API Telegram
+            const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodedMessage}&parse_mode=Markdown`);
+            const data = await response.json();
+
+            if (data.ok) {
+                showAlert('✅ Commande envoyée avec succès! Nous vous contacterons bientôt.', 'success');
+                form.reset();
+                
+                // Animation de confirmation
+                const confirmation = document.createElement('div');
+                confirmation.innerHTML = `
+                    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                        background: rgba(0,0,0,0.8); z-index: 9999; display: flex; 
+                        justify-content: center; align-items: center; flex-direction: column;">
+                        <div style="background: white; padding: 2em; border-radius: 16px; text-align: center;
+                            max-width: 500px; animation: zoomIn 0.5s;">
+                            <div style="font-size: 5em; color: #2ed573; margin-bottom: 0.5em;">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3 style="color: var(--dark-color); margin-bottom: 1em;">Commande confirmée!</h3>
+                            <p style="margin-bottom: 1.5em;">Nous avons bien reçu votre commande et vous contacterons dans les plus brefs délais.</p>
+                            <button onclick="this.parentElement.parentElement.remove()" 
+                                style="background: var(--gradient); color: white; border: none; 
+                                padding: 0.75em 1.5em; border-radius: 30px; font-weight: 600;
+                                cursor: pointer; transition: all 0.3s;">
+                                Fermer
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(confirmation);
+            } else {
+                showAlert('❌ Une erreur est survenue. Veuillez réessayer plus tard.', 'danger');
+                console.error('Erreur Telegram:', data);
+            }
+        } catch (error) {
+            showAlert('❌ Erreur réseau. Veuillez vérifier votre connexion.', 'danger');
+            console.error('Erreur:', error);
+        } finally {
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+        }
     });
 
     // Fonction pour valider les numéros de téléphone
