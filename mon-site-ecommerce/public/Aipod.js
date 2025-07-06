@@ -11,7 +11,20 @@ document.addEventListener('DOMContentLoaded', function() {
             // Pré-remplir le formulaire
             document.getElementById('productName').value = productName;
             document.getElementById('productID').value = productId;
-            
+            fetch('/api/order', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    productName,
+    productID,
+    customerNumber,
+    whatsappNumber,
+    comment,
+    serviceType: 'aipod' // Différenciez le type de produit
+  })
+})
             // Scroll vers le formulaire
             document.getElementById('contact-form').scrollIntoView({
                 behavior: 'smooth'
