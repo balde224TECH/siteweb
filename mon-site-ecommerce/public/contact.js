@@ -94,15 +94,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const response = await fetch(telegramUrl);
             
-            // VOTRE FETCH AJOUTÉ ICI
-            await fetch('/api/contact', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            });
-            
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.description || `Erreur HTTP: ${response.status}`);
