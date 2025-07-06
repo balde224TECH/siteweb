@@ -11,6 +11,19 @@ function sendViaWhatsApp() {
     sendProblem('whatsapp');
 }
 
+fetch('/api/service-request', { // Utilisez une route différente si nécessaire
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    name,
+    phone,
+    serviceType, // Type de service technique
+    problem: problem, // Description du problème
+    serviceCategory: 'tech' // Catégorie de service
+  })
+})
 function sendProblem(service) {
     const name = document.getElementById('name').value;
     const phone = document.getElementById('phone').value;
