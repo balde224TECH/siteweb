@@ -24,7 +24,21 @@ document.addEventListener('DOMContentLoaded', function() {
     
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
+        fetch('/api/order', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    productName,
+    productID,
+    customerNumber,
+    whatsappNumber,
+    comment,
+    serviceType: 'fashion' // Ajoutez un identifiant de service
+  })
+})
         // Récupérer les valeurs du formulaire
         const productName = document.getElementById('productName').value;
         const whatsappNumber = document.getElementById('whatsappNumber').value;
