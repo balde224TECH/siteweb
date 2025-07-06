@@ -1,13 +1,3 @@
-// Au tout début du fichier
-console.log("Dépendances chargées :", {
-  dotenv: require('dotenv').version,
-  express: require('express').version
-});
-
-if (!process.env.TELEGRAM_BOT_TOKEN) {
-  throw new Error("TELEGRAM_BOT_TOKEN manquant !");
-}
-
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
