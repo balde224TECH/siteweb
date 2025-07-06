@@ -1,3 +1,6 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('orderForm');
+    
     // Gérer le clic sur les boutons "Commander"
     document.querySelectorAll('.product-btn').forEach(button => {
         button.addEventListener('click', function(e) {
@@ -15,7 +18,7 @@
         });
     });
 
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const productName = document.getElementById('productName').value;
@@ -33,15 +36,46 @@
             return;
         }
 
-        let message = `Bonjour SanoussyAuto,\n\n`;
-        message += `Je suis intéressé par un véhicule.\n`;
-        if (productName) message += `Modèle: ${productName}\n`;
-        if (customerName) message += `Nom: ${customerName}\n`;
-        message += `Téléphone: ${customerNumber}\n`;
-        if (comment) message += `Message: ${comment}\n`;
+        // Afficher un indicateur de chargement
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
+        submitBtn.disabled = true;
 
-        const encodedMessage = encodeURIComponent(message);
-        window.location.href = `https://wa.me/224664278708?text=${encodedMessage}`;
+        try {
+            // Envoi à votre API
+            await fetch('/api/order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productName,
+                    customerName,
+                    customerNumber,
+                    comment,
+                    serviceType: 'auto'
+                })
+            });
+
+            // Préparation du message WhatsApp
+            let message = `Bonjour SanoussyAuto,\n\n`;
+            message += `Je suis intéressé par un véhicule.\n`;
+            if (productName) message += `Modèle: ${productName}\n`;
+            if (customerName) message += `Nom: ${customerName}\n`;
+            message += `Téléphone: ${customerNumber}\n`;
+            if (comment) message += `Message: ${comment}\n`;
+
+            const encodedMessage = encodeURIComponent(message);
+            window.location.href = `https://wa.me/224664278708?text=${encodedMessage}`;
+
+        } catch (error) {
+            console.error('Erreur:', error);
+            showAlert('Une erreur est survenue lors de l\'envoi de la commande.', 'danger');
+        } finally {
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+        }
     });
 
     function isValidPhoneNumber(phone) {
@@ -69,19 +103,6 @@
                 </button>
             </div>
         `;
-        fetch('/api/order', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    productName,
-    customerName, // Champ spécifique à voiture.js
-    customerNumber,
-    comment,
-    serviceType: 'auto' // Identifiant pour les véhicules
-  })
-})
 
         document.body.appendChild(alertDiv);
         
@@ -121,3 +142,4 @@
             card.style.transform = 'translateY(0) rotateZ(0)';
         });
     });
+});
