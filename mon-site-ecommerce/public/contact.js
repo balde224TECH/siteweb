@@ -35,18 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     setInterval(createParticle, 300);
-    fetch('/api/contact', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    name,
-    email, // Champ spécifique au contact
-    subject,
-    message
-  })
-})
     
     // Effet de survol sur les info-items
     const infoItems = document.querySelectorAll('.info-item');
@@ -105,6 +93,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodedMessage}`;
             
             const response = await fetch(telegramUrl);
+            
+            // VOTRE FETCH AJOUTÉ ICI
+            await fetch('/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
             
             if (!response.ok) {
                 const errorData = await response.json();
